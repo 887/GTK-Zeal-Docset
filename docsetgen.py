@@ -3,7 +3,6 @@ import gzip
 import xml.etree.ElementTree as etree
 
 docsets = [{'folder':'GTK3',    'devhelp':'gtk3'},
-		   {'folder':'GTK2',    'devhelp':'gtk2'},
            {'folder':'GLib',    'devhelp':'glib'},
            {'folder':'GIO',     'devhelp':'gio'},
            {'folder':'GObject', 'devhelp':'gobject'},
@@ -12,7 +11,8 @@ docsets = [{'folder':'GTK3',    'devhelp':'gtk3'},
            {'folder':'Cairo',   'devhelp':'cairo'},]
 
 types = {'enum':'Enum', 'function':'Function', 'macro':'Macro', 'property':'Property', 'constant':'Constant',
-         'signal':'Event', 'struct':'Struct', 'typedef':'Define', 'union':'Union', 'variable': 'Variable', 'method': 'Method'}
+         'signal':'Event', 'struct':'Struct', 'typedef':'Define', 'union':'Union', 'variable': 'Variable', 'method': 'Method',
+         'member': 'Member'}
 
 dbpath = '{0}.docset/Contents/Resources/docSet.dsidx'
 gzpath = '{0}.docset/Contents/Resources/Documents/{1}.devhelp2.gz'
@@ -25,10 +25,10 @@ for docset in docsets:
 
 	try: cur.execute('DROP TABLE searchIndex;')
 	except: pass
-	
+
 	cur.execute('CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);')
 	cur.execute('CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);')
-	
+
 	try:
 		xmlfile = gzip.open(gzpath.format(docset['folder'], docset['devhelp']))
 	except FileNotFoundError:
@@ -36,15 +36,19 @@ for docset in docsets:
 
 	tree = etree.parse(xmlfile)
 	book = tree.getroot()
-	
+
 	subs = book.findall('.//{http://www.devhelp.net/book}sub')
 	for sub in subs:
 		cur.execute(insertsql, (sub.get('name'), 'Section', sub.get('link')))
-		
+
 	keywords = book.findall('.//{http://www.devhelp.net/book}keyword')
 	for keyword in keywords:
-		cur.execute(insertsql, (keyword.get('name'), types[keyword.get('type')] if keyword.get('type') else 'Section', keyword.get('link')))
-		
+                keyword_name = keyword.get('name')
+                keyword_type = keyword.get('type')
+                keyword_link = keyword.get('link')
+                _type = types[keyword_type]
+                cur.execute(insertsql, (keyword_name, _type if keyword_type else 'Section', keyword_link))
+
 	db.commit()
 	db.close()
 	xmlfile.close()

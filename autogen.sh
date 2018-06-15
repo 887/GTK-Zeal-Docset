@@ -13,13 +13,6 @@ sed -i 's_/usr/share/gtk-doc/html/atk_../../../../ATK.docset/Contents/Resources/
 sed -i 's_/usr/share/gtk-doc/html/pango_../../../../Pango.docset/Contents/Resources/Documents_g' GTK3.docset${docpath}/*.html
 sed -i 's_/usr/share/gtk-doc/html/cairo_../../../../Cairo.docset/Contents/Resources/Documents_g' GTK3.docset${docpath}/*.html
 
-echo "Generating gtk2 docset..."
-mkdir -p GTK2.docset${docpath}
-cp -r ${sysdocpath}/gtk2/* GTK2.docset${docpath}
-sed -i 's_http://library.gnome.org/devel/glib/unstable_../../../../GLib.docset/Contents/Resources/Documents_g' GTK2.docset${docpath}/*.html
-sed -i 's_http://library.gnome.org/devel/gio/unstable_../../../../GIO.docset/Contents/Resources/Documents_g' GTK2.docset${docpath}/*.html
-sed -i 's_http://library.gnome.org/devel/gobject/unstable_../../../../GObject.docset/Contents/Resources/Documents_g' GTK2.docset${docpath}/*.html
-
 echo "Generating glib docset..."
 mkdir -p GLib.docset${docpath}
 cp -r ${sysdocpath}/glib/* GLib.docset${docpath}
